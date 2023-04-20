@@ -1,0 +1,22 @@
+{
+  "name": "react-quickstart",
+  "scripts": {
+    "dev-ts": "parcel --no-cache src/typescript/index.html",
+    "dev-js": "parcel --no-cache src/javascript/index.html"
+  },
+  "dependencies": {
+    "@botui/react": "^1.1.1",
+    "axios": "^1.3.5",
+    "botui": "^1.1.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.7.0",
+    "@types/react": "^18.0.21",
+    "@types/react-dom": "^18.0.6",
+    "buffer": "^6.0.3",
+    "parcel": "^2.7.0",
+    "process": "^0.11.10"
+  }
+}
