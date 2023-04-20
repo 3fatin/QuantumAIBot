@@ -1,7 +1,6 @@
 import React from "react"
 import { createRoot } from "react-dom/client"
-
-import "@botui/react/dist/styles/default.theme.scss"
+import * as styles from '../../dist/index.19e5b2c6.css';
 import { MainContainer } from "./MessageContainer/MessageContainer"
 
 const App = () => {
