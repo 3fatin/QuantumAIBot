@@ -32,6 +32,7 @@ const speechSynthesis = window.speechSynthesis;
     const [response, setResponse] = useState("")
     const [isAudioInput, setAudioInput] = useState(false)
     const [isprompt, setPrompt] = useState(false)
+    const [oldTranscript, setOldTranscript] = useState("")
 
     const {
         transcript,
@@ -46,7 +47,7 @@ const speechSynthesis = window.speechSynthesis;
   
       const closeRecord = () => {
           {SpeechRecognition.stopListening()};
-          {resetTranscript()};
+          setOldTranscript(transcript)
       }
     
 
@@ -88,10 +89,15 @@ const speechSynthesis = window.speechSynthesis;
      }, [response])
 
      useEffect(() => {
-        if(isAudioInput){
+        if(isAudioInput){               
         console.log("New Input: ", input)
         input!="" && AddMsg();
+        setOldTranscript(transcript); 
     }}, [input, isAudioInput, isprompt])
+
+    useEffect(() => {
+      console.log("Old Transcript: ", oldTranscript)
+    }, [oldTranscript]);
 
         const handleInput = (event) => {
             setAudioInput(false)
@@ -109,7 +115,8 @@ const speechSynthesis = window.speechSynthesis;
             console.log("Entered Handle Voice Input")
             {SpeechRecognition.stopListening()};
             console.log(transcript)
-            setInput(transcript)
+            const newTranscript = transcript.replace(oldTranscript,"")
+            setInput(newTranscript)
         }
 
         const AddMsg = () => {                        
