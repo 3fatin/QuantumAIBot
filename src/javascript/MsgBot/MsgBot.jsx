@@ -1,9 +1,16 @@
-import { useBotUI, useBotUIAction } from "@botui/react"
+// import { useBotUI, useBotUIAction } from "@botui/react"
 
-export const addMessage = () => {
-  const bot = useBotUI()
-  return(                
-   (bot.next({text:hi}))              
-  
-  )
-}
+
+//   const bot = useBotUI()
+ 
+//   const actionRenderers = {
+//     "userInput":UserMsg
+//   }
+
+//   const UserMsg = () => {
+//     const bot = useBotUI()
+//     const action = useBotUIAction()
+//     const input = action?.data.msg
+
+
+//   }
