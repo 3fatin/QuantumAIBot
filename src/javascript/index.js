@@ -1,7 +1,6 @@
-import logo from '../Assets/logo.jpg'
 import React from "react"
 import { createRoot } from "react-dom/client"
-import * as styles from '../../dist/index.19e5b2c6.css';
+// import * as styles from '../../dist/index.19e5b2c6.css';
 import { MainContainer } from "./MessageContainer/MessageContainer"
 
 const axios = require('axios');
