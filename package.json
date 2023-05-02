@@ -3,7 +3,7 @@
   "scripts": {
     "dev-ts": "parcel --no-cache src/typescript/index.html",
     "dev-js": "parcel --no-cache src/javascript/index.html",
-    "build": "parcel build src/javascript/index.html"
+    "build": "parcel build src/typescript/index.html"
   },
   "dependencies": {
     "@botui/react": "^1.1.1",
