@@ -31,6 +31,7 @@ const speechSynthesis = window.speechSynthesis;
     const [input, setInput] = useState("")
     const [response, setResponse] = useState("")
     const [isAudioInput, setAudioInput] = useState(false)
+    const [isprompt, setPrompt] = useState(false)
 
     const {
         transcript,
@@ -80,7 +81,7 @@ const speechSynthesis = window.speechSynthesis;
       useEffect(() => {
 
         console.log("New response: ", response)
-        response!="" && (
+        isprompt && (
         mybot.message.add({text : response})
         .then(() => handleResponseSpeech()))
      
@@ -90,15 +91,17 @@ const speechSynthesis = window.speechSynthesis;
         if(isAudioInput){
         console.log("New Input: ", input)
         input!="" && AddMsg();
-    }}, [input, isAudioInput])
+    }}, [input, isAudioInput, isprompt])
 
         const handleInput = (event) => {
             setAudioInput(false)
+            setPrompt(true)
             setInput(event.target.value)
         }
 
         const startAudio = () => {
             setAudioInput(true)
+            setPrompt(true)
             {SpeechRecognition.startListening({continuous: true})};
         }
 
@@ -117,8 +120,19 @@ const speechSynthesis = window.speechSynthesis;
                     {fetchResponse()};
                 })
                 .then(()=> setInput(""))
-                .then(()=>mybot.wait({waitTime : 3000}))
+                // .then(()=>mybot.wait({waitTime : 3000}))
                 .then(()=> console.log("Response Success"))
+                .then(()=> {
+                  mybot.message.add({
+                    loading: true
+                }).then(function (index) {
+                    console.log('entered');
+                    // get the index of the empty message and delete it
+                    mybot.message.remove(index);
+                    // display action with 0 delay
+                })
+                })
+                
         }
 
         async function fetchResponse() {
