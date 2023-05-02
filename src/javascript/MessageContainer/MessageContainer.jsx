@@ -99,7 +99,7 @@ const speechSynthesis = window.speechSynthesis;
 
         const startAudio = () => {
             setAudioInput(true)
-            {SpeechRecognition.startListening()};
+            {SpeechRecognition.startListening({continuous: true})};
         }
 
         async function handleVoiceInput() {
@@ -145,59 +145,63 @@ const speechSynthesis = window.speechSynthesis;
         <div className='MainContainer'>
             <div className="HeaderBar">
                 <img src={logo} height={'40px'} width={'40px'}/>
-                <span>Qauntum AI Bot</span>
+                <span>Quantum AI Bot</span>
+            </div>
+            <div className='chatName'>
+              <span>Quantum Bot</span>
             </div>
           <div className='MessageContainer' style={{backgroundImage: {logo}}}>
             <BotUI bot={mybot}>
-              <BotUIMessageList />
-              <BotUIAction />
+              
+                <BotUIMessageList />
+                <BotUIAction />
             </BotUI>
           </div>
-            <div className='MessageInputBox'>
-                <form>
-                    <input id="MsgInput" type='text' placeholder='Enter your text here' onChange={handleInput} onSubmit={AddMsg} value={input} ></input>
-                    <button id="SendBtn" className='SubmitBtn' onClick={AddMsg} disabled = { input === ""}><SendIcon /></button>                    
-                    <input type='submit' hidden onSubmit={AddMsg}></input>  
-                    <div>
-                        {listening?
-                        (
-                            <div>
-                                <IconButton
-                                        color="secondary"
-                                        aria-label="stop recording"
-                                        onClick={handleVoiceInput}                                        
-                                        >
-                                        <FiberManualRecordIcon />
-                                        </IconButton>
-                                <IconButton                       
-                                    aria-label="start recording"
-                                    onClick={closeRecord}                            
-                                >
-                                <DisabledByDefaultIcon />
-                                </IconButton>
-                            </div>
-                        ):(
-                            <div>
-                            <IconButton
-                                color='blue'                       
-                                aria-label="start recording"
-                                onClick= {startAudio}                      
-                            >
-                                <MicIcon />
-                            </IconButton>
-                            
-                            <IconButton 
-                                color='blue'                      
-                                aria-label="start recording"                                
-                                onClick= {handleResponseSpeech}                      
-                            >
-                                <CampaignIcon />
-                            </IconButton>                      
-                            </div>
-                        )}
-                    </div>
-                </form>   
-            </div>
+              <div className='MessageInputBox'>
+                  <form>
+                      <input id="MsgInput" type='text' placeholder='Enter your text here' onChange={handleInput} onSubmit={AddMsg} value={input} ></input>
+                      <button id="SendBtn" className='SubmitBtn' onClick={AddMsg} disabled = { input === ""}><SendIcon /></button>                    
+                      <input type='submit' hidden onSubmit={AddMsg}></input>  
+                      <div>
+                          {listening?
+                          (
+                              <div>
+                                  <IconButton
+                                          color="secondary"
+                                          aria-label="stop recording"
+                                          onClick={handleVoiceInput}                                        
+                                          >
+                                          <FiberManualRecordIcon />
+                                          </IconButton>
+                                  <IconButton                       
+                                      aria-label="start recording"
+                                      onClick={closeRecord}                            
+                                  >
+                                  <DisabledByDefaultIcon />
+                                  </IconButton>
+                              </div>
+                          ):(
+                              <div>
+                              <IconButton
+                                  color='blue'                       
+                                  aria-label="start recording"
+                                  onClick= {startAudio}                      
+                              >
+                                  <MicIcon />
+                              </IconButton>
+                              
+                              <IconButton 
+                                  color='blue'                      
+                                  aria-label="start recording"                                
+                                  onClick= {handleResponseSpeech}                      
+                              >
+                                  <CampaignIcon />
+                              </IconButton>                      
+                              </div>
+                          )}
+                      </div>
+                  </form>   
+              </div>
             
           <div className='disclaimer'>
             <span >This is a demo version of the Bot</span>
