@@ -15,6 +15,8 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import SendIcon from '@mui/icons-material/Send'; 
 import CampaignIcon from '@mui/icons-material/Campaign';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
+import { v4 as uuidv4 } from 'uuid';
+
 
 
 
@@ -33,6 +35,26 @@ const speechSynthesis = window.speechSynthesis;
     const [isAudioInput, setAudioInput] = useState(false)
     const [isprompt, setPrompt] = useState(false)
     const [oldTranscript, setOldTranscript] = useState("")
+    const [initialOption, setInitialOption] = useState(false)
+    const [sessionId, setSessionId] = useState("")
+    const [inputJson, setInputJson] = useState({
+      "question": "",
+      "options": [],
+      "answer": "",
+      "topic": 0,
+      "response": "",
+      "sessionId": "",
+      "condition": null      
+   });
+
+  //  "condition": null
+
+  const [responseJson, setResponseJson] = useState({})
+
+ const [surveyResponse, setSurveyResponse] = useState("")
+ const [questionCount, setQuestionCount] = useState(0)
+ const [endResponseJson, setEndResponseJson] = useState({})
+ const [finalScore, setFinalScore] = useState(0)
 
     const {
         transcript,
@@ -56,14 +78,14 @@ const speechSynthesis = window.speechSynthesis;
           .add({ text: "Hello" })
           .then(() => mybot.wait({ waitTime: 1000 }))
           .then(() => mybot.message.add({ text: "I'm the Quantum AI Bot. You can ask me any question." }))
-          .then(() => mybot.message.add({ text: "How are you?" }))
+          .then(() => mybot.message.add({ text: "How do you want to proceed?" }))
           .then(() => mybot.wait({ waitTime: 500 }))
           .then(() =>
             mybot.action.set(
               {
                 options: [
-                  { label: "Good", value: "good" },
-                  { label: "Great", value: "great" },
+                  { label: "Start Survey", value: "Start Survey" },
+                  { label: "Chat With Bot", value: "Chat With Bot" },
                 ],
               },
               { actionType: "selectButtons" }
@@ -73,10 +95,11 @@ const speechSynthesis = window.speechSynthesis;
           )
           .then((data) => mybot.wait({ waitTime: 500 }, data))
           .then((data) =>
-            mybot.message.add({ text: `You are feeling ${data?.selected?.label}!` })
+            // mybot.message.add({ text: `You are feeling ${data?.selected?.label}!` })
+            {data?.selected?.label == "Chat With Bot" ? setInitialOption(true): generateSessionId()}
           )
           .then(()=>mybot.wait({waitTime:1000}))
-          .then(()=> mybot.message.add({text:"How can I help you?"}))         
+          // .then(()=> mybot.message.add({text:"How can I help you?"}))         
       }, [])
 
       useEffect(() => {
@@ -98,6 +121,71 @@ const speechSynthesis = window.speechSynthesis;
     useEffect(() => {
       console.log("Old Transcript: ", oldTranscript)
     }, [oldTranscript]);
+
+    useEffect(() => {
+      handleSurvey();
+    }, [sessionId]);
+
+    useEffect(() => {
+      const optionsList = [];
+      // if(Array.isArray(responseJson?.options)){
+        responseJson?.options?.map((option,index) => (        
+          optionsList = [...optionsList,{label: `${option}`, value: `${option}`}]
+        ))
+      // }
+      .then(() => mybot.message.add({text: `${responseJson.question}`}))      
+      .then(() => {
+        mybot.action.set({
+          options:{optionsList}
+        },
+        { actionType: "selectButtons" }
+        )
+      })
+      .then((res) => setSurveyResponse(res.selected.label))
+    }, [responseJson]);
+
+    useEffect(() => {
+      setQuestionCount(questionCount+1)
+    },[surveyResponse]);
+
+    useEffect(() => {
+      handleSurvey();
+    }, [inputJson]);
+
+    useEffect(() => {
+      questionCount<5 ? setInputJson({
+        "question": `${responseJson.question}`,
+        "options": `${responseJson.options}`,
+        "answer": `${responseJson.answer}`,
+        "topic": 0,
+        "response": `${surveyResponse}`,
+        "sessionId": `${sessionId}`,
+        "condition": null
+        }) : setInputJson({
+          "question": `${responseJson.question}`,
+          "options": `${responseJson.options}`,
+          "answer": `${responseJson.answer}`,
+          "topic": 0,
+          "response": `${surveyResponse}`,
+          "sessionId": `${sessionId}`,
+          "condition": "stop"
+          })
+    },[questionCount]);
+
+    useEffect(() => {
+      const score = 0;
+      if(Array.isArray(endResponseJson)){
+      endResponseJson.map((item,index) => (
+        item.correct = "yes" && score == score+1
+      ))
+      .then(() => setFinalScore(score))
+    }
+      
+    }, [endResponseJson]);
+
+    useEffect(() => {
+      mybot.message.add({text: `Your score is ${finalScore}`})
+    },[finalScore]);
 
         const handleInput = (event) => {
             setAudioInput(false)
@@ -161,6 +249,21 @@ const speechSynthesis = window.speechSynthesis;
                 speechSynthesis.speak(utterance);
             }
         }
+
+        const generateSessionId = () => {
+          const uuid = uuidv4();
+          // setSessionId(uuid);
+          console.log(uuid);
+          setInputJson({...inputJson, sessionId : uuid})
+        }
+
+        const handleSurvey = () => {
+          const surveyUrl = "https://hipaa-audit-api.onrender.com/audit";
+
+          axios.post(surveyUrl, inputJson)
+          .then((res) => {
+          questionCount < 5 ? setResponseJson(res.data) : setEndResponseJson(res.data)})
+        }
     
       return (
         <div className='MainContainer'>
@@ -178,7 +281,7 @@ const speechSynthesis = window.speechSynthesis;
                 <BotUIAction />
             </BotUI>
           </div>
-              <div className='MessageInputBox'>
+            {initialOption && <div className='MessageInputBox'>
                   <form>
                       <input id="MsgInput" type='text' placeholder='Enter your text here' onChange={handleInput} onSubmit={AddMsg} value={input} ></input>
                       <button id="SendBtn" className='SubmitBtn' onClick={AddMsg} disabled = { input === ""}><SendIcon /></button>                    
@@ -223,7 +326,7 @@ const speechSynthesis = window.speechSynthesis;
                       </div>
                   </form>   
               </div>
-            
+            }
           <div className='disclaimer'>
             <span >This is a demo version of the Bot</span>
           </div>
