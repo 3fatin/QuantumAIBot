@@ -49,12 +49,21 @@ const speechSynthesis = window.speechSynthesis;
 
   //  "condition": null
 
-  const [responseJson, setResponseJson] = useState({})
+  const [responseJson, setResponseJson] = useState({
+    "question": "",
+      "options": ["option1", "option2", "option3", "option4"],
+      "answer": "",
+      "topic": 0,
+      "response": "",
+      "sessionId": "",
+      "condition": null  
+  })
 
  const [surveyResponse, setSurveyResponse] = useState("")
  const [questionCount, setQuestionCount] = useState(0)
  const [endResponseJson, setEndResponseJson] = useState({})
  const [finalScore, setFinalScore] = useState(0)
+ const [optionsList, setOptionsList] = useState([])
 
     const {
         transcript,
@@ -74,6 +83,8 @@ const speechSynthesis = window.speechSynthesis;
     
 
     useEffect(() => {
+      // console.log(`Initial Option is ${initialOption}`)
+      console.log(responseJson.options)
         mybot.message
           .add({ text: "Hello" })
           .then(() => mybot.wait({ waitTime: 1000 }))
@@ -122,57 +133,76 @@ const speechSynthesis = window.speechSynthesis;
       console.log("Old Transcript: ", oldTranscript)
     }, [oldTranscript]);
 
-    useEffect(() => {
-      handleSurvey();
-    }, [sessionId]);
+    // useEffect(() => {
+    //   handleSurvey();
+    // }, [sessionId]);
 
     useEffect(() => {
-      const optionsList = [];
-      // if(Array.isArray(responseJson?.options)){
-        responseJson?.options?.map((option,index) => (        
-          optionsList = [...optionsList,{label: `${option}`, value: `${option}`}]
-        ))
-      // }
-      .then(() => mybot.message.add({text: `${responseJson.question}`}))      
-      .then(() => {
-        mybot.action.set({
-          options:{optionsList}
-        },
-        { actionType: "selectButtons" }
-        )
-      })
-      .then((res) => setSurveyResponse(res.selected.label))
+      if(responseJson.question != ""){
+      console.log(`Options are` + responseJson?.options)
+      console.log(responseJson)
+      mybot.message.add({text: `${responseJson?.question}`}) 
+      .then(() => 
+          mybot.action.set({
+            options:[
+              {label: responseJson.options[0], value: responseJson.options[0]},
+              {label: responseJson.options[1], value: responseJson.options[1]},
+              {label: responseJson.options[2], value: responseJson.options[2]},
+              {label: responseJson.options[3], value: responseJson.options[3]},
+            ]
+          },
+          { actionType: "selectButtons" }
+          )
+      )
+      .then((res) => setSurveyResponse(res?.selected?.label))
+    }
     }, [responseJson]);
 
     useEffect(() => {
-      setQuestionCount(questionCount+1)
+      if(responseJson.question != ""){
+        console.log(`Entered Survey Response - ${surveyResponse}`)
+        setQuestionCount(questionCount+1)
+      }
     },[surveyResponse]);
 
     useEffect(() => {
+      if(inputJson.sessionId != ""){
       handleSurvey();
+     
+        mybot.message.add({
+          loading: true
+      }).then(function (index) {
+          console.log('entered');
+          // get the index of the empty message and delete it
+          mybot.message.remove(index);
+          // display action with 0 delay
+      })
+      
+      }
     }, [inputJson]);
 
     useEffect(() => {
-      questionCount<5 ? setInputJson({
+      console.log(`Entered Question Count - ${questionCount}`)
+      if(responseJson.question != ""){
+        console.log("Entered validation")
+      questionCount < 5 ? setInputJson({...inputJson,
         "question": `${responseJson.question}`,
-        "options": `${responseJson.options}`,
+        "options": responseJson.options,
         "answer": `${responseJson.answer}`,
         "topic": 0,
         "response": `${surveyResponse}`,
-        "sessionId": `${sessionId}`,
-        "condition": null
-        }) : setInputJson({
+        }) : setInputJson({...inputJson,
           "question": `${responseJson.question}`,
           "options": `${responseJson.options}`,
           "answer": `${responseJson.answer}`,
           "topic": 0,
           "response": `${surveyResponse}`,
-          "sessionId": `${sessionId}`,
           "condition": "stop"
-          })
+          })}
     },[questionCount]);
 
     useEffect(() => {
+      console.log(`Entered End Repsonse - ${endResponseJson}`)
       const score = 0;
       if(Array.isArray(endResponseJson)){
       endResponseJson.map((item,index) => (
@@ -184,7 +214,9 @@ const speechSynthesis = window.speechSynthesis;
     }, [endResponseJson]);
 
     useEffect(() => {
+      if(responseJson.question != ""){
       mybot.message.add({text: `Your score is ${finalScore}`})
+      }
     },[finalScore]);
 
         const handleInput = (event) => {
@@ -251,6 +283,7 @@ const speechSynthesis = window.speechSynthesis;
         }
 
         const generateSessionId = () => {
+          console.log("Entered into generateSessionId")
           const uuid = uuidv4();
           // setSessionId(uuid);
           console.log(uuid);
@@ -258,11 +291,19 @@ const speechSynthesis = window.speechSynthesis;
         }
 
         const handleSurvey = () => {
-          const surveyUrl = "https://hipaa-audit-api.onrender.com/audit";
-
+          console.log("Entered into handle survey")
+          // const surveyUrl = "https://hipaa-audit-api.onrender.com/audit";
+          const surveyUrl = "https://hipaa-demo.onrender.com/audit";
           axios.post(surveyUrl, inputJson)
           .then((res) => {
-          questionCount < 5 ? setResponseJson(res.data) : setEndResponseJson(res.data)})
+          questionCount < 5 ? setResponseJson({...responseJson,
+            "question" : `${res?.data?.question}`,
+            "options" : res?.data?.options,
+            "answer" : `${res?.data?.answer}`
+          }) : 
+          // setEndResponseJson(res.data)     
+          mybot.message.add({text : "Thank you for the survey!"})     
+        })
         }
     
       return (

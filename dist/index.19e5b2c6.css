@@ -1,8 +1,10 @@
 .botui_action {
   width: auto;
+  height: auto;
   max-width: 75%;
+  justify-content: space-between;
   padding: 7px 20px;
-  display: inline-block;
+  display: flex;
 }
 
 .botui_action textarea, .botui_action input:not([type="file"]), .botui_action select {
@@ -11,7 +13,8 @@
   border: 0;
   border-bottom: 1px solid #15cbfd;
   border-radius: 0;
-  margin: 0 2px;
+  flex-grow: 1;
+  margin: 5px 0;
   padding: 5px 7px;
   font-family: Helvetica;
 }
