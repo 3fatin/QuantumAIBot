@@ -43,25 +43,25 @@ const speechSynthesis = window.speechSynthesis;
       "answer": "",
       "topic": 0,
       "response": "",
-      "sessionId": "",
-      "condition": null      
+      "sessionid": "",
+      "condition": ""      
    });
 
   //  "condition": null
 
   const [responseJson, setResponseJson] = useState({
-    "question": "",
+      "question": "",
       "options": ["option1", "option2", "option3", "option4"],
       "answer": "",
       "topic": 0,
       "response": "",
-      "sessionId": "",
-      "condition": null  
+      "sessionid": "",
+      "condition": ""  
   })
 
  const [surveyResponse, setSurveyResponse] = useState("")
  const [questionCount, setQuestionCount] = useState(0)
- const [endResponseJson, setEndResponseJson] = useState({})
+ const [endResponseJson, setEndResponseJson] = useState([{},{},{},{}])
  const [finalScore, setFinalScore] = useState(0)
  const [optionsList, setOptionsList] = useState([])
 
@@ -89,7 +89,7 @@ const speechSynthesis = window.speechSynthesis;
           .add({ text: "Hello" })
           .then(() => mybot.wait({ waitTime: 1000 }))
           .then(() => mybot.message.add({ text: "I'm the Quantum AI Bot. You can ask me any question." }))
-          .then(() => mybot.message.add({ text: "How do you want to proceed?" }))
+          .then(() => mybot.message.add({ text: "How would you like to proceed?" }))
           .then(() => mybot.wait({ waitTime: 500 }))
           .then(() =>
             mybot.action.set(
@@ -149,12 +149,20 @@ const speechSynthesis = window.speechSynthesis;
               {label: responseJson.options[1], value: responseJson.options[1]},
               {label: responseJson.options[2], value: responseJson.options[2]},
               {label: responseJson.options[3], value: responseJson.options[3]},
+              {label: "Other", value: "Other"},
             ]
           },
           { actionType: "selectButtons" }
           )
       )
-      .then((res) => setSurveyResponse(res?.selected?.label))
+      // .then((res) => setSurveyResponse(res?.selected?.label))
+      .then((res) => {
+        if(res?.selected?.label == "Other"){
+          handleCustomAnswer();
+        } else{
+          setSurveyResponse(res?.selected?.label);
+        }
+      })
     }
     }, [responseJson]);
 
@@ -166,7 +174,7 @@ const speechSynthesis = window.speechSynthesis;
     },[surveyResponse]);
 
     useEffect(() => {
-      if(inputJson.sessionId != ""){
+      if(inputJson.sessionid != ""){
       handleSurvey();
      
         mybot.message.add({
@@ -203,12 +211,13 @@ const speechSynthesis = window.speechSynthesis;
 
     useEffect(() => {
       console.log(`Entered End Repsonse - ${endResponseJson}`)
-      const score = 0;
+      var score = 0;
       if(Array.isArray(endResponseJson)){
       endResponseJson.map((item,index) => (
-        item.correct = "yes" && score == score+1
+        item?.valid == "Yes" ? score = score+1 : score = score
+        // console.log(`Valid at ${index} is ` + item?.valid)
       ))
-      .then(() => setFinalScore(score))
+      setFinalScore(score);
     }
       
     }, [endResponseJson]);
@@ -287,23 +296,34 @@ const speechSynthesis = window.speechSynthesis;
           const uuid = uuidv4();
           // setSessionId(uuid);
           console.log(uuid);
-          setInputJson({...inputJson, sessionId : uuid})
+          setInputJson({...inputJson, sessionid : uuid})
         }
 
         const handleSurvey = () => {
+          var objArray = [];
           console.log("Entered into handle survey")
           // const surveyUrl = "https://hipaa-audit-api.onrender.com/audit";
           const surveyUrl = "https://hipaa-demo.onrender.com/audit";
           axios.post(surveyUrl, inputJson)
           .then((res) => {
-          questionCount < 5 ? setResponseJson({...responseJson,
+          if(questionCount < 5){ setResponseJson({...responseJson,
             "question" : `${res?.data?.question}`,
             "options" : res?.data?.options,
             "answer" : `${res?.data?.answer}`
-          }) : 
-          // setEndResponseJson(res.data)     
-          mybot.message.add({text : "Thank you for the survey!"})     
+          })} else{           
+          Object.keys(res.data).forEach(key => {
+            objArray = [...objArray, res.data[key]];
+          });
+          setEndResponseJson(objArray)  
+        }
         })
+        }
+
+        const handleCustomAnswer = () => {
+          var inputAnswer = ""
+          mybot.action.set({ placeholder: 'Type your answer' }, { actionType: 'input' })
+          .then((data) => inputAnswer = data.value)
+          .then(() => setSurveyResponse(inputAnswer))
         }
     
       return (
