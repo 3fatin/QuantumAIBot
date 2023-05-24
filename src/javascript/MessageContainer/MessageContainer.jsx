@@ -303,7 +303,7 @@ const speechSynthesis = window.speechSynthesis;
           var objArray = [];
           console.log("Entered into handle survey")
           // const surveyUrl = "https://hipaa-audit-api.onrender.com/audit";
-          const surveyUrl = "https://hipaa-demo.onrender.com/audit";
+          const surveyUrl = "https://hipaa-demo.onrender.com/preaudit";
           axios.post(surveyUrl, inputJson)
           .then((res) => {
           if(questionCount < 5){ setResponseJson({...responseJson,
