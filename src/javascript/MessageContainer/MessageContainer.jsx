@@ -141,14 +141,19 @@ const speechSynthesis = window.speechSynthesis;
       if(responseJson.question != ""){
       console.log(`Options are` + responseJson?.options)
       console.log(responseJson)
-      mybot.message.add({text: `${responseJson?.question}`}) 
+      const inputString = responseJson?.options;
+      const jsonArray = inputString.split(',').map(s => s.trim());
+      for (let i = 0; i < jsonArray.length; i++) {
+        jsonArray[i] = jsonArray[i].replace(/"|\[|\'|\]/g, "");
+      }
+      mybot.message.add({text: `${responseJson?.question}`})
       .then(() => 
           mybot.action.set({
             options:[
-              {label: responseJson.options[0], value: responseJson.options[0]},
-              {label: responseJson.options[1], value: responseJson.options[1]},
-              {label: responseJson.options[2], value: responseJson.options[2]},
-              {label: responseJson.options[3], value: responseJson.options[3]},
+              {label: jsonArray[0], value: jsonArray[0]},
+              {label: jsonArray[1], value: jsonArray[1]},
+              {label: jsonArray[2], value: jsonArray[2]},
+              {label: jsonArray[3], value: jsonArray[3]},
               {label: "Other", value: "Other"},
             ]
           },
