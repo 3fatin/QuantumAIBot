@@ -1,34 +1,32 @@
 .botui_action {
   width: auto;
-  height: auto;
   max-width: 75%;
-  justify-content: space-between;
   padding: 7px 20px;
-  display: flex;
+  display: inline-block;
 }
 
 .botui_action textarea, .botui_action input:not([type="file"]), .botui_action select {
   vertical-align: bottom;
-  color: #017ea0;
+  color: #1e6553;
+  background-color: #0000;
   border: 0;
-  border-bottom: 1px solid #15cbfd;
+  border-bottom: 1px solid #37bc9b;
   border-radius: 0;
-  flex-grow: 1;
-  margin: 5px 0;
+  margin: 0 2px;
   padding: 5px 7px;
-  font-family: Helvetica;
+  font-family: Open Sans, sans-serif;
 }
 
 .botui_button {
   color: #fff;
   cursor: pointer;
   vertical-align: bottom;
-  background: #02aedd;
+  background: #2b957a;
   border: 0;
   border-radius: 4px;
   margin: 0 2px;
   padding: 7px 15px;
-  font-family: Helvetica;
+  font-family: Open Sans, sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 1;
@@ -50,65 +48,35 @@
 .botui_message_content {
   width: auto;
   max-width: 75%;
-  color: #015e78;
-  letter-spacing: .5px;
-  background-color: #fff;
-  border-top-right-radius: 15px;
-  border-bottom-left-radius: 15px;
-  border-bottom-right-radius: 15px;
-  padding: 7px 16px;
-  font-size: 1.1em;
-  line-height: 1.2;
+  color: #1e6553;
+  background-color: #bbebdf;
+  border-radius: 15px;
+  padding: 7px 13px;
   display: inline-block;
   overflow: scroll;
 }
 
 .botui_message_content.human {
   float: right;
-  color: #2e2cb0;
-  background-color: #adedfe;
-  border-radius: 15px 15px 0;
+  color: #cef1e8;
+  background-color: #37bc9b;
 }
 
 .botui_message_content iframe {
   border: 0;
 }
 
-.botui_message_content::-webkit-scrollbar {
-  display: none;
-}
-
-.chatName {
-  width: 620px;
-  height: 50px;
-  text-align: center;
-  color: #fff;
-  background-color: #029ac4;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  margin-top: 65px;
-  margin-left: auto;
-  margin-right: auto;
-  font-family: Georgia;
-  font-size: 24px;
-  font-weight: 500;
-  line-height: 50px;
-  box-shadow: 0 5px 8px #a7a7a7;
-}
-
 .botui_app_container {
   width: 100%;
   height: 100%;
-  background-color: #eee;
-  margin: 1px auto 0;
   line-height: 1;
 }
 
 @media (min-width: 400px) {
   .botui_app_container {
-    height: 550px;
-    width: 600px;
-    padding-right: 20px;
+    width: 400px;
+    height: 500px;
+    margin: 0 auto;
   }
 }
 
@@ -117,10 +85,6 @@
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-}
-
-.botui_container::-webkit-scrollbar {
-  display: none;
 }
 
 .botui_message {
@@ -145,7 +109,7 @@
 .loading_dot {
   width: .5rem;
   height: .5rem;
-  background-color: #15cbfd;
+  background-color: #37bc9b;
   border-radius: .5rem;
   display: inline-block;
 }
@@ -166,7 +130,7 @@
 
 @keyframes loading {
   0% {
-    background-color: #48d6fd;
+    background-color: #58ceb1;
     transform: translate(0);
   }
 
@@ -175,7 +139,7 @@
   }
 
   50% {
-    background-color: #48d6fd;
+    background-color: #58ceb1;
     transform: translate(0);
   }
 
@@ -195,160 +159,6 @@
 .slide-fade-enter, .slide-fade-exit-done {
   opacity: 0;
   transform: translateX(-10px);
-}
-
-.MessageInputBox > form > input {
-  color: #000;
-  height: 1cm;
-  width: 100%;
-  box-sizing: border-box;
-  border: 1px solid #fff;
-  border-radius: 5px;
-  outline: none;
-}
-
-.MessageInputBox > form > input::placeholder {
-  color: gray;
-}
-
-@media (max-width: 400px) {
-  .MessageInputBox > form > input {
-    height: .5cm;
-  }
-}
-
-.MessageInputBox > form {
-  width: 600px;
-  background-color: #eee;
-  flex-direction: row;
-  justify-content: center;
-  margin: auto;
-  padding: 10px;
-  display: flex;
-}
-
-.MessageInputBox > form > button, .MessageInputBox > form > div > div > button {
-  color: #fff;
-  height: 1cm;
-  width: 1cm;
-  background-color: #02aedd;
-  border: solid #02aedd;
-  border-radius: 5px;
-  margin-left: 10px;
-}
-
-.MessageInputBox > form > button:disabled, .MessageInputBox > form > div > div > button:disabled, .MessageInputBox > form > button:disabled:hover, .MessageInputBox > form > div > div > button:disabled:hover {
-  background-color: #b1ecfe;
-  border: solid #b1ecfe;
-}
-
-.MessageInputBox > form > button:hover, .MessageInputBox > form > div > div > button:hover {
-  background-color: #15cbfd, 15%;
-  border: solid #15cbfd, 15%;
-}
-
-@media (max-width: 400px) {
-  .MessageInputBox > form > button, .MessageInputBox > form > div > div > button {
-    height: .5cm;
-    width: 1.25cm;
-  }
-}
-
-.MessageContainer {
-  width: 100%;
-}
-
-.MainContainer {
-  flex-direction: column;
-  display: flex;
-}
-
-.disclaimer {
-  color: gray;
-  text-align: center;
-  margin-top: 20px;
-  font-size: small;
-}
-
-.HeaderBar {
-  color: #fff;
-  text-align: right;
-  width: 96.5%;
-  height: 60px;
-  background-image: linear-gradient(to left, #02aedd, #fff);
-  flex-direction: row;
-  justify-content: space-between;
-  padding-left: 25px;
-  padding-right: 25px;
-  font-family: Georgia;
-  font-size: 25px;
-  font-weight: 400;
-  line-height: 60px;
-  display: flex;
-  position: fixed;
-  top: 0;
-  left: 0;
-  box-shadow: 6px 0 8px -4px #d3d3d3;
-}
-
-.HeaderBar > img {
-  height: 60px;
-  width: 80px;
-}
-
-.App {
-  flex-direction: column;
-  display: flex;
-}
-
-.AudioInput {
-  height: 1cm;
-  width: 40%;
-  flex-direction: row;
-  justify-content: center;
-  margin: auto;
-  padding: 2px;
-  display: flex;
-}
-
-.AudioInput > AudioControl {
-  width: 60%;
-}
-
-.AudioInput > button {
-  color: #fff;
-  height: 1cm;
-  width: 1cm;
-  background-color: #4240cf;
-  border: solid #4240cf;
-  border-radius: 5px;
-  margin-left: 10px;
-}
-
-.AudioInput > button:disabled, .AudioInput > button:disabled:hover {
-  background-color: #b1ecfe;
-  border: solid #b1ecfe;
-}
-
-.AudioInput > button:hover {
-  background-color: #2e2cb0;
-  border: solid #2e2cb0;
-}
-
-@media (max-width: 400px) {
-  .AudioInput > button {
-    height: .5cm;
-    width: 1.25cm;
-  }
-}
-
-.MessageInputBox > form > div > div {
-  flex-direction: row;
-  display: flex;
-}
-
-.MessageArea {
-  height: 550px;
 }
 
 /*# sourceMappingURL=index.c28793a2.css.map */

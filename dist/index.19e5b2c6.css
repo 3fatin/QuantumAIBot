@@ -351,4 +351,9 @@
   height: 550px;
 }
 
+.Screen {
+  flex-direction: row;
+  display: flex;
+}
+
 /*# sourceMappingURL=index.19e5b2c6.css.map */

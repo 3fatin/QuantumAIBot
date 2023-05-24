@@ -61,9 +61,9 @@ const speechSynthesis = window.speechSynthesis;
 
  const [surveyResponse, setSurveyResponse] = useState("")
  const [questionCount, setQuestionCount] = useState(0)
- const [endResponseJson, setEndResponseJson] = useState([{},{},{},{}])
- const [finalScore, setFinalScore] = useState(0)
- const [optionsList, setOptionsList] = useState([])
+ const [endResponseJson, setEndResponseJson] = useState("")
+//  const [finalScore, setFinalScore] = useState(0)
+const [analysis, setAnalysis] = useState(false)
 
     const {
         transcript,
@@ -146,6 +146,7 @@ const speechSynthesis = window.speechSynthesis;
       for (let i = 0; i < jsonArray.length; i++) {
         jsonArray[i] = jsonArray[i].replace(/"|\[|\'|\]/g, "");
       }
+      console.log(jsonArray)
       mybot.message.add({text: `${responseJson?.question}`})
       .then(() => 
           mybot.action.set({
@@ -162,7 +163,29 @@ const speechSynthesis = window.speechSynthesis;
       )
       // .then((res) => setSurveyResponse(res?.selected?.label))
       .then((res) => {
-        if(res?.selected?.label == "Other"){
+        if(res?.selected?.label == null){
+          mybot.message.remove(5)
+          .then(() => 
+          mybot.action.set({
+            options:[
+              {label: jsonArray[0], value: jsonArray[0]},
+              {label: jsonArray[1], value: jsonArray[1]},
+              {label: jsonArray[2], value: jsonArray[2]},
+              {label: jsonArray[3], value: jsonArray[3]},
+              {label: "Other", value: "Other"},
+            ]
+          },
+          { actionType: "selectButtons" }
+          ))
+          .then((ans) => {
+            if(ans?.selected?.label == "Other"){
+              handleCustomAnswer();
+            } else{
+              setSurveyResponse(ans?.selected?.label);
+            }
+          })
+        }
+        else if(res?.selected?.label == "Other"){
           handleCustomAnswer();
         } else{
           setSurveyResponse(res?.selected?.label);
@@ -181,7 +204,7 @@ const speechSynthesis = window.speechSynthesis;
     useEffect(() => {
       if(inputJson.sessionid != ""){
       handleSurvey();
-     
+     if(questionCount < 5){
         mybot.message.add({
           loading: true
       }).then(function (index) {
@@ -190,7 +213,7 @@ const speechSynthesis = window.speechSynthesis;
           mybot.message.remove(index);
           // display action with 0 delay
       })
-      
+    }
       }
     }, [inputJson]);
 
@@ -215,23 +238,32 @@ const speechSynthesis = window.speechSynthesis;
     },[questionCount]);
 
     useEffect(() => {
-      console.log(`Entered End Repsonse - ${endResponseJson}`)
-      var score = 0;
-      if(Array.isArray(endResponseJson)){
-      endResponseJson.map((item,index) => (
-        item?.valid == "Yes" ? score = score+1 : score = score
-        // console.log(`Valid at ${index} is ` + item?.valid)
-      ))
-      setFinalScore(score);
-    }
+      setAnalysis(true)
+      console.log(`Entered End Repsonse - ` + endResponseJson)
+    //   var score = 0;
+    //   if(Array.isArray(endResponseJson)){
+    //   endResponseJson.map((item,index) => (
+    //     item?.valid == "Yes" ? score = score+1 : score = score
+    //     // console.log(`Valid at ${index} is ` + item?.valid)
+    //   ))      
+    //   setFinalScore(score)      
+    // }
       
-    }, [endResponseJson]);
+    }, [endResponseJson])
 
-    useEffect(() => {
-      if(responseJson.question != ""){
-      mybot.message.add({text: `Your score is ${finalScore}`})
-      }
-    },[finalScore]);
+    // useEffect(() => {
+    //   if(responseJson.question != ""){
+    //     console.log(finalScore)
+    //   mybot.message.add({text: `Your score is ${finalScore}`})
+    //   }
+    // },[finalScore]);
+
+    // useEffect(() => {
+      
+    //   if(responseJson.question != ""){
+    //     console.log(`Entered Final Score ${finalScore}`)
+    //   }
+    // },[finalScore])
 
         const handleInput = (event) => {
             setAudioInput(false)
@@ -309,6 +341,9 @@ const speechSynthesis = window.speechSynthesis;
           console.log("Entered into handle survey")
           // const surveyUrl = "https://hipaa-audit-api.onrender.com/audit";
           const surveyUrl = "https://hipaa-demo.onrender.com/preaudit";
+          if(questionCount == 5){
+            mybot.message.add({ text : "Thankyou for taking the survey."})
+          }
           axios.post(surveyUrl, inputJson)
           .then((res) => {
           if(questionCount < 5){ setResponseJson({...responseJson,
@@ -316,10 +351,12 @@ const speechSynthesis = window.speechSynthesis;
             "options" : res?.data?.options,
             "answer" : `${res?.data?.answer}`
           })} else{           
-          Object.keys(res.data).forEach(key => {
-            objArray = [...objArray, res.data[key]];
-          });
-          setEndResponseJson(objArray)  
+          // Object.keys(res.data).forEach(key => {
+          //   console.log(res.data[key])
+          //   objArray = [...objArray, res.data[key]]
+          //   console.log(objArray)
+          // });
+          setEndResponseJson(res.data)  
         }
         })
         }
@@ -332,6 +369,7 @@ const speechSynthesis = window.speechSynthesis;
         }
     
       return (
+        // <div className="Screen">
         <div className='MainContainer'>
             <div className="HeaderBar">
                 <img src={logo} height={'40px'} width={'40px'}/>
@@ -393,9 +431,17 @@ const speechSynthesis = window.speechSynthesis;
                   </form>   
               </div>
             }
+
+            {analysis && <div>
+                <span>{endResponseJson}</span>
+              </div>
+            }
+            
           <div className='disclaimer'>
             <span >This is a demo version of the Bot</span>
           </div>
         </div>
+        
+      
     )    
 }
