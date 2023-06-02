@@ -306,7 +306,7 @@ export const MainContainer = () => {
   const handleSurvey = () => {
     var objArray = [];
     console.log("Entered into handle survey")
-    const surveyUrl = "http://127.0.0.1:8000/preaudit";
+    const surveyUrl = "https://hipaa-demo.onrender.com/preaudit";
     if (questionCount == 5) {
       mybot.message.add({ text: "Thankyou for taking the survey." })
       setloadingAnim(true)
