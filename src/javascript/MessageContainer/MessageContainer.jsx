@@ -11,7 +11,6 @@ import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognitio
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import SendIcon from '@mui/icons-material/Send';
 import CampaignIcon from '@mui/icons-material/Campaign';
-import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import { v4 as uuidv4 } from 'uuid';
 
 const mybot = createBot();
@@ -19,8 +18,7 @@ const speechSynthesis = window.speechSynthesis;
 
 
 const styles = [
-  { property: 'letter-spacing', value: '1px' },
-  { property: 'font-size', value: '14px' },
+  { property: 'font-size', value: '1.2em' },
   { property: 'text-align', value: 'center' }
 ];
 
@@ -79,7 +77,6 @@ export const MainContainer = () => {
 
   useEffect(() => {
     // console.log(`Initial Option is ${initialOption}`)
-    console.log(responseJson.options)
     mybot.message
       .add({ text: "Hello" })
       .then(() => mybot.wait({ waitTime: 1000 }))
@@ -90,8 +87,7 @@ export const MainContainer = () => {
         mybot.action.set(
           {
             options: [
-              { label: "Start Survey", value: "Start Survey" },
-              { label: "Chat With Bot", value: "Chat With Bot" },
+              { label: "Start Survey", value: "Start Survey" }
             ],
           },
           { actionType: "selectButtons" }
@@ -107,7 +103,6 @@ export const MainContainer = () => {
 
   useEffect(() => {
 
-    console.log("New response: ", response)
     isprompt && (
       mybot.message.add({ text: response })
         .then(() => handleResponseSpeech()))
@@ -116,7 +111,6 @@ export const MainContainer = () => {
 
   useEffect(() => {
     if (isAudioInput) {
-      console.log("New Input: ", input)
       input != "" && AddMsg();
       setOldTranscript(transcript);
     }
@@ -128,8 +122,6 @@ export const MainContainer = () => {
 
   useEffect(() => {
     if (responseJson.question != "") {
-      console.log(`Options are` + responseJson?.options)
-      console.log(responseJson)
       const inputString = responseJson?.options;
       const jsonArray = inputString.split(',').map(s => s.trim());
       for (let i = 0; i < jsonArray.length; i++) {
@@ -142,8 +134,7 @@ export const MainContainer = () => {
               { label: jsonArray[0], value: jsonArray[0] },
               { label: jsonArray[1], value: jsonArray[1] },
               { label: jsonArray[2], value: jsonArray[2] },
-              { label: jsonArray[3], value: jsonArray[3] },
-              { label: "Other", value: "Other" },
+              { label: jsonArray[3], value: jsonArray[3] }
             ]
           },
             { actionType: "selectButtons" }
@@ -151,7 +142,6 @@ export const MainContainer = () => {
         )
         // .then((res) => setSurveyResponse(res?.selected?.label))
         .then((res) => {
-          console.log('here baby'+res?.selected)
           if (res?.selected?.label == null) {
             mybot.message.remove(5)
               .then(() =>
@@ -160,14 +150,12 @@ export const MainContainer = () => {
                     { label: jsonArray[0], value: jsonArray[0] },
                     { label: jsonArray[1], value: jsonArray[1] },
                     { label: jsonArray[2], value: jsonArray[2] },
-                    { label: jsonArray[3], value: jsonArray[3] },
-                    { label: "Other", value: "Other" },
+                    { label: jsonArray[3], value: jsonArray[3] }
                   ]
                 },
                   { actionType: "selectButtons" }
                 ))
               .then((ans) => {
-                console.log('select here baby ' + ans)
                 if (ans?.selected?.label == "Other") {
                   handleCustomAnswer();
                 } else {
@@ -186,13 +174,13 @@ export const MainContainer = () => {
 
   useEffect(() => {
     if (responseJson.question != "") {
-      console.log(`Entered Survey Response - ${surveyResponse}`)
+      
       setQuestionCount(questionCount + 1)
     }
   }, [surveyResponse]);
 
   useEffect(() => {
-    console.log('input json here baby')
+    
     if (inputJson.sessionid != "") {
       handleSurvey();
       if (questionCount < 5) {
@@ -206,9 +194,8 @@ export const MainContainer = () => {
   }, [inputJson]);
 
   useEffect(() => {
-    console.log(`Entered Question Count - ${questionCount}`)
     if (responseJson.question != "") {
-      console.log("Entered validation")
+      
       questionCount < 5 ? setInputJson({
         ...inputJson,
         "question": `${responseJson.question}`,
@@ -233,7 +220,21 @@ export const MainContainer = () => {
 
       setloadingAnim(false)
       setAnalysis(true)
-      console.log(`Entered End Repsonse - ` + endResponseJson)
+      
+      // Split the response into paragraphs based on double line breaks ("\n\n")
+      var paragraphs = endResponseJson.split('\n\n');
+
+      // Create a <p> element for each paragraph and append it to the <div> with id "api-response"
+      var apiResponseDiv = document.getElementById('api-response');
+      paragraphs.forEach(function (paragraphText) {
+      var paragraph = document.createElement('p');
+      paragraph.textContent = paragraphText;
+      paragraph.style.fontSize = "1.2em";
+      paragraph.style.textAlign = "center";
+      apiResponseDiv.appendChild(paragraph);
+      });
+      
+      
     }
 
   }, [endResponseJson])
@@ -252,7 +253,6 @@ export const MainContainer = () => {
 
   async function handleVoiceInput() {
     { SpeechRecognition.stopListening() };
-    console.log(transcript)
     const newTranscript = transcript.replace(oldTranscript, "")
     setInput(newTranscript)
   }
@@ -260,7 +260,6 @@ export const MainContainer = () => {
   const AddMsg = () => {
     mybot.message.add({ text: input }, { fromHuman: true })
       .then(() => {
-        console.log(input)
         { fetchResponse() };
       })
       .then(() => setInput(""))
@@ -270,7 +269,6 @@ export const MainContainer = () => {
         mybot.message.add({
           loading: true
         }).then(function (index) {
-          console.log('entered');
           mybot.message.remove(index);
         })
       })
@@ -280,7 +278,6 @@ export const MainContainer = () => {
   async function fetchResponse() {
     const promptInput = input.split(" ").join("%20")
     const url = `https://hipaa-test-api.onrender.com/gpt?promt=${promptInput}`
-    console.log(url)
     const res = await axios.get(url)
       .then((res) => setResponse(`${res.data.answer}`))
   }
@@ -298,14 +295,12 @@ export const MainContainer = () => {
   }
 
   const generateSessionId = () => {
-    console.log("Entered into generateSessionId")
     const uuid = uuidv4();
     setInputJson({ ...inputJson, sessionid: uuid })
   }
 
   const handleSurvey = () => {
     var objArray = [];
-    console.log("Entered into handle survey")
     const surveyUrl = "https://hipaa-demo.onrender.com/preaudit";
     if (questionCount == 5) {
       mybot.message.add({ text: "Thankyou for taking the survey." })
@@ -352,9 +347,9 @@ export const MainContainer = () => {
             {!loadingAnim && <span style={{ textAlign: 'center', fontSize: '1.1em' }}>Take the survey to generate analysis</span>}
             {loadingAnim && <div class="loader"></div>}
           </div>}
-          {analysis && <div><p>{endResponseJson}</p>
+          <div id="api-response" style={{padding: '10px', borderRadius: '14px'}}>
           </div>
-          }
+          
         </div>
       </div>
       {initialOption && <div className='MessageInputBox'>
