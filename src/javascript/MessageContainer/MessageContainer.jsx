@@ -87,7 +87,8 @@ export const MainContainer = () => {
         mybot.action.set(
           {
             options: [
-              { label: "Start Survey", value: "Start Survey" }
+              { label: "Start Survey", value: "Start Survey" },
+              { label: "Chat With Bot", value: "Chat With Bot" },
             ],
           },
           { actionType: "selectButtons" }
@@ -277,8 +278,12 @@ export const MainContainer = () => {
 
   async function fetchResponse() {
     const promptInput = input.split(" ").join("%20")
-    const url = `https://hipaa-test-api.onrender.com/gpt?promt=${promptInput}`
-    const res = await axios.get(url)
+    const payload = {
+      "query": promptInput,
+      "category": "Regulations"
+    }
+    const url = 'https://hipaa.onrender.com/audit'
+    const res = await axios.post(url, payload)
       .then((res) => setResponse(`${res.data.answer}`))
   }
 
@@ -301,9 +306,9 @@ export const MainContainer = () => {
 
   const handleSurvey = () => {
     var objArray = [];
-    const surveyUrl = "https://hipaa-demo.onrender.com/preaudit";
+    const surveyUrl = "https://hipaa.onrender.com/preaudit";
     if (questionCount == 5) {
-      mybot.message.add({ text: "Thankyou for taking the survey." })
+      mybot.message.add({ text: "Thank you for taking the survey." })
       setloadingAnim(true)
     }
 
@@ -336,11 +341,61 @@ export const MainContainer = () => {
         <span>Quantum AI Bot</span>
       </div>
       <div className='MessageContainer' style={{ backgroundImage: { logo }, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div>
         <BotUI bot={mybot}>
 
-          <BotUIMessageList />
-          <BotUIAction />
-        </BotUI>
+<BotUIMessageList />
+<BotUIAction />
+</BotUI>
+{initialOption && <div className='MessageInputBox'>
+<form>
+<input id="MsgInput" type='text' placeholder='Enter your text here' onChange={handleInput} onSubmit={AddMsg} value={input} ></input>
+<button id="SendBtn" className='SubmitBtn' onClick={AddMsg} disabled={input === ""}><SendIcon /></button>
+<input type='submit' hidden onSubmit={AddMsg}></input>
+<div>
+  {listening ?
+    (
+      <div>
+        <IconButton
+          color="secondary"
+          aria-label="stop recording"
+          onClick={handleVoiceInput}
+        >
+          <FiberManualRecordIcon />
+        </IconButton>
+        <IconButton
+          aria-label="start recording"
+          onClick={closeRecord}
+        >
+          <DisabledByDefaultIcon />
+        </IconButton>
+      </div>
+    ) : (
+      <div>
+        <IconButton
+          color='blue'
+          aria-label="start recording"
+          onClick={startAudio}
+        >
+          <MicIcon />
+        </IconButton>
+
+        <IconButton
+          color='blue'
+          aria-label="start recording"
+          onClick={handleResponseSpeech}
+        >
+          <CampaignIcon />
+        </IconButton>
+      </div>
+    )}
+</div>
+
+</form>
+
+</div>
+}
+        </div>   
         <div id="analysis" style={{ margin: '0 auto', maxWidth: '30%', overflowY: 'scroll', height: '400px' }}>
           <h1 style={{ textAlign: 'center' }}>Analysis</h1>
           {!analysis && <div style={{ textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
@@ -352,54 +407,7 @@ export const MainContainer = () => {
           
         </div>
       </div>
-      {initialOption && <div className='MessageInputBox'>
-        <form>
-          <input id="MsgInput" type='text' placeholder='Enter your text here' onChange={handleInput} onSubmit={AddMsg} value={input} ></input>
-          <button id="SendBtn" className='SubmitBtn' onClick={AddMsg} disabled={input === ""}><SendIcon /></button>
-          <input type='submit' hidden onSubmit={AddMsg}></input>
-          <div>
-            {listening ?
-              (
-                <div>
-                  <IconButton
-                    color="secondary"
-                    aria-label="stop recording"
-                    onClick={handleVoiceInput}
-                  >
-                    <FiberManualRecordIcon />
-                  </IconButton>
-                  <IconButton
-                    aria-label="start recording"
-                    onClick={closeRecord}
-                  >
-                    <DisabledByDefaultIcon />
-                  </IconButton>
-                </div>
-              ) : (
-                <div>
-                  <IconButton
-                    color='blue'
-                    aria-label="start recording"
-                    onClick={startAudio}
-                  >
-                    <MicIcon />
-                  </IconButton>
-
-                  <IconButton
-                    color='blue'
-                    aria-label="start recording"
-                    onClick={handleResponseSpeech}
-                  >
-                    <CampaignIcon />
-                  </IconButton>
-                </div>
-              )}
-          </div>
-
-        </form>
-
-      </div>
-      }
+      
 
 
 
