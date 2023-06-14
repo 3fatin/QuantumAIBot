@@ -80,7 +80,7 @@ export const MainContainer = () => {
     mybot.message
       .add({ text: "Hello" })
       .then(() => mybot.wait({ waitTime: 1000 }))
-      .then(() => mybot.message.add({ text: "I'm the Quantum AI Bot. You can ask me any question." }))
+      .then(() => mybot.message.add({ text: "I'm the Lucid Lucid Assessment Bot. You can ask me any question." }))
       .then(() => mybot.message.add({ text: "How would you like to proceed?" }))
       .then(() => mybot.wait({ waitTime: 500 }))
       .then(() =>
@@ -338,7 +338,7 @@ export const MainContainer = () => {
     <div className='MainContainer'>
       <div className="HeaderBar">
         <img src={logo} height={'40px'} width={'40px'} />
-        <span>Quantum AI Bot</span>
+        <span>Lucid Assessment Bot</span>
       </div>
       <div className='MessageContainer' style={{ backgroundImage: { logo }, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div>
