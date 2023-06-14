@@ -80,7 +80,7 @@ export const MainContainer = () => {
     mybot.message
       .add({ text: "Hello" })
       .then(() => mybot.wait({ waitTime: 1000 }))
-      .then(() => mybot.message.add({ text: "I'm the Lucid Lucid Assessment Bot. You can ask me any question." }))
+      .then(() => mybot.message.add({ text: "I'm the Lucid Assessment Bot. You can ask me any question." }))
       .then(() => mybot.message.add({ text: "How would you like to proceed?" }))
       .then(() => mybot.wait({ waitTime: 500 }))
       .then(() =>
