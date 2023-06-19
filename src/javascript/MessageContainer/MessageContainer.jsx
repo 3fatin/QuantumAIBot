@@ -12,9 +12,11 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import SendIcon from '@mui/icons-material/Send';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import { v4 as uuidv4 } from 'uuid';
+import io from 'socket.io-client';
 
 const mybot = createBot();
 const speechSynthesis = window.speechSynthesis;
+const socket = io('http://localhost:4000');
 
 
 const styles = [
@@ -74,6 +76,11 @@ export const MainContainer = () => {
     setOldTranscript(transcript)
   }
 
+  const [datachunk, setDatachunk] = useState("");
+  const [processedRes, setProcessedRes] = useState([]);
+
+  const analysisRef = useRef(null);
+
 
   useEffect(() => {
     // console.log(`Initial Option is ${initialOption}`)
@@ -100,6 +107,8 @@ export const MainContainer = () => {
       .then((data) => { data?.selected?.label == "Chat With Bot" ? setInitialOption(true) : generateSessionId() }
       )
       .then(() => mybot.wait({ waitTime: 1000 }))
+      
+      
   }, [])
 
   useEffect(() => {
@@ -207,7 +216,7 @@ export const MainContainer = () => {
       }) : setInputJson({
         ...inputJson,
         "question": `${responseJson.question}`,
-        "options": `${responseJson.options}`,
+        "options": responseJson.options,
         "answer": `${responseJson.answer}`,
         "topic": 0,
         "response": `${surveyResponse}`,
@@ -224,21 +233,27 @@ export const MainContainer = () => {
       
       // Split the response into paragraphs based on double line breaks ("\n\n")
       var paragraphs = endResponseJson.split('\n\n');
-
+      
       // Create a <p> element for each paragraph and append it to the <div> with id "api-response"
-      var apiResponseDiv = document.getElementById('api-response');
+      // var apiResponseDiv = document.getElementById('api-response');
       paragraphs.forEach(function (paragraphText) {
-      var paragraph = document.createElement('p');
-      paragraph.textContent = paragraphText;
-      paragraph.style.fontSize = "1.2em";
-      paragraph.style.textAlign = "center";
-      apiResponseDiv.appendChild(paragraph);
+       
+        //   var paragraph = document.createElement('p');
+        //   analysisRef.current.textContent = paragraphText;
+        //   analysisRef.current.style.fontSize = "1.2em";
+        //   analysisRef.current.style.textAlign = "center";
+        //   apiResponseDiv.appendChild(paragraph);   
+        setProcessedRes(paragraphs);
       });
       
       
     }
 
   }, [endResponseJson])
+
+  useEffect(() => {
+    setEndResponseJson(datachunk)
+  }, [datachunk])
 
   const handleInput = (event) => {
     setAudioInput(false)
@@ -310,21 +325,21 @@ export const MainContainer = () => {
     if (questionCount == 5) {
       mybot.message.add({ text: "Thank you for taking the survey." })
       setloadingAnim(true)
+      socket.emit('streamInput', inputJson);
     }
-
-    axios.post(surveyUrl, inputJson)
-      .then((res) => {
-        if (questionCount < 5) {
-          setResponseJson({
-            ...responseJson,
-            "question": `${res?.data?.question}`,
-            "options": res?.data?.options,
-            "answer": `${res?.data?.answer}`
-          })
-        } else {
-          setEndResponseJson(res.data)
-        }
-      })
+    else{
+      axios.post(surveyUrl, inputJson)
+        .then((res) => {
+          if (questionCount < 5) {
+            setResponseJson({
+              ...responseJson,
+              "question": `${res?.data?.question}`,
+              "options": res?.data?.options,
+              "answer": `${res?.data?.answer}`
+            })
+          }
+        })
+    }
   }
 
   const handleCustomAnswer = () => {
@@ -333,6 +348,16 @@ export const MainContainer = () => {
       .then((data) => inputAnswer = data.value)
       .then(() => setSurveyResponse(inputAnswer))
   }
+
+  socket.on('response', data => {
+    // console.log(data);
+    const uint8Array = new Uint8Array(data);
+    const textDecoder = new TextDecoder('utf-8');
+    const resultString = textDecoder.decode(uint8Array);
+    // console.log(resultString);
+    const chunk = `${datachunk}${resultString}`
+    setDatachunk(chunk);
+  })
 
   return (
     <div className='MainContainer'>
@@ -403,6 +428,12 @@ export const MainContainer = () => {
             {loadingAnim && <div class="loader"></div>}
           </div>}
           <div id="api-response" style={{padding: '10px', borderRadius: '14px'}}>
+            {analysis && 
+              <div>
+                {processedRes.map((res, index) => (
+                  <p>{res}</p>
+                ))}
+              </div>}
           </div>
           
         </div>
