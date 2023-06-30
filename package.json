@@ -15,10 +15,12 @@
     "botui": "^1.1.2",
     "mic-recorder-to-mp3": "^2.2.2",
     "react": "^18.2.0",
+    "react-audio-player": "^0.17.0",
     "react-dom": "^18.2.0",
     "react-speech": "^1.0.2",
     "react-speech-recognition": "^3.10.0",
     "regenerator-runtime": "^0.13.11",
+    "socket.io-client": "^4.6.2",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
